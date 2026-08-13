@@ -146,23 +146,33 @@ npx tsx relay-server/index.ts  # relay
 | 管理后台 | http://localhost:3002/admin |
 | relay | http://localhost:3003 |
 
-## 定时任务（Crons）
+## CORS 白名单同步
 
-后端内置 5 个定时任务，随后端进程启动（`src/server/index.ts` 中挂载）：
+系统有两处 CORS 白名单（浏览器跨域请求的门卫，只放行名单中的网页）：
 
-| 任务 | 周期 | 作用 | 配置项 |
-|------|------|------|--------|
-| **入站监控** | 每 30s | 拉取中转邮箱新申请 → 校验 → 入库 → 转发服务商 | `INBOUND_POLL_INTERVAL` |
-| **回件监控** | 每 30s | 拉取 400cz 邮箱服务商回复 → 线程关联 → 确认/拒绝判定 | `POLL_INTERVAL`（固定 30s）|
-| **补偿任务** | 每 5 分钟 | 重发失败邮件（上限 5 次，状态感知过滤）| `COMPENSATE_INTERVAL` |
-| **超时提醒** | 每 1 小时 | 扫描 pending/unclear 超 24h 的申请 → 邮件提醒售后 | `TIMEOUT_CHECK_INTERVAL` / `PENDING_TIMEOUT_HOURS` |
-| **附件清理** | 每 24 小时 | 清理孤儿/空文件/已完成超期附件（启动时立即执行一次）| `CLEAN_INTERVAL` / `CLEAN_EXPIRED_DAYS` 等 |
+| 位置 | 管什么 | 配置项 |
+|------|--------|--------|
+| 内网后端 | 管理后台页面调用后端 API | `ALLOWED_ORIGINS` |
+| 公网 relay | 公网前端页面调用 relay 提交 | `RELAY_ALLOWED_ORIGINS` |
 
-**说明**：
-- 全部为**进程内定时器**（`setInterval`），随后端进程运行，无需外部 cron
-- 监控类任务失败不中断（异常捕获 + 日志），并有健康检查接口 `GET /api/admin/health` 展示监控状态
-- 附件清理删除前记录日志（文件名+原因），单次上限 `CLEAN_MAX_PER_RUN` 防误删
-- 入站处理失败自动重试（最多 3 次），连续失败发告警邮件给售后
+**⚠️ 更换访问地址（域名/IP）时必须同步更新白名单**，否则页面报错"被 CORS 拦截"：
+
+```bash
+# 示例：本地 → 公网域名
+# 内网后端 .env
+ALLOWED_ORIGINS=https://apply.company.com,http://内网IP
+
+# 公网 relay .env
+RELAY_ALLOWED_ORIGINS=https://apply.company.com
+```
+
+**常见场景**：
+- 本地开发：`http://localhost:3001`（前端）、`http://localhost:3002`（管理后台）
+- 局域网访问：加入 `http://192.168.x.x:3002`（本机 IP）
+- 公网部署：加入 `https://apply.company.com`（正式域名）
+- ngrok 隧道测试：加入 `https://xxx.ngrok-free.dev`（域名每次重启可能变化）
+
+> 判断方法：页面能打开但数据加载失败，浏览器控制台报 `Not allowed by CORS` → 就是白名单没加当前访问地址。
 
 ## 部署
 
