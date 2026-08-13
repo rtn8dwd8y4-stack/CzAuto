@@ -32,3 +32,6 @@ Thumbs.db
 # 日志
 *.log
 npm-debug.log*
+
+# 本地说明文档（不上传）
+*.html
