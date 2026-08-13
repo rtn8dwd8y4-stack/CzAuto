@@ -1,5 +1,7 @@
 # CzAuto - 客户服务申请系统
 
+> **仓库地址**：https://github.com/rtn8dwd8y4-stack/CzAuto （私有仓库，需协作者授权访问）
+
 邮件驱动的客户服务申请自动化系统：客户在公网提交服务申请，系统自动完成**提交 → 邮件中转 → 域名校验 → 服务商身份验证 → 售后通知**的完整闭环。
 
 ## 核心设计
@@ -69,7 +71,7 @@ CzAuto/
 │   ├── public/templates/        # 模板副本（前端静态）
 │   ├── scripts/                 # 本地运维脚本（start-all / watchdog）
 │   └── .env.example             # 环境变量模板
-├── react-hook-form/             # 本地依赖库（构建必需，需单独放置）
+├── react-hook-form/             # 本地依赖库（fork 自官方，构建必需，见下方说明）
 └── deploy/                      # 部署配置（Dockerfile / compose / 文档）
 ```
 
@@ -79,7 +81,44 @@ CzAuto/
 
 - Node.js 20+ / pnpm
 - MySQL 8（本地或远程）
-- `react-hook-form/` 目录需放置到项目根（fork 的本地依赖）
+
+### ⚠️ 重要：react-hook-form 本地依赖（构建前必须放置）
+
+本项目使用 **fork 自 react-hook-form 官方仓库的本地依赖**（`package.json` 中声明为 `"react-hook-form": "file:..\react-hook-form"`）。该目录**未上传到 GitHub**（体积大且含自身 .git），需要你手动获取：
+
+**获取方式（任选其一）**：
+
+```bash
+# 方式 A：从本机其他位置复制（如果已有）
+#   将你本地的 react-hook-form 目录复制到项目根：
+#   CzAuto/
+#   ├── client-service-app/
+#   ├── react-hook-form/     ← 放到这里，与 client-service-app 平级
+#   └── deploy/
+
+# 方式 B：从 GitHub fork 官方仓库（标准做法）
+cd CzAuto
+git clone https://github.com/react-hook-form/react-hook-form.git react-hook-form
+# ⚠️ 注意：如果项目依赖了 fork 中的自定义修改，此方式得到的是官方原版，
+#    可能缺少项目所需的改动，请确认与开发机上的版本一致
+
+# 方式 C：压缩包传输（推荐，保证与开发环境一致）
+#   1. 在开发机上把 react-hook-form 目录压缩（zip，排除 node_modules/.git）
+#   2. 传到新环境解压到 CzAuto/react-hook-form/
+```
+
+**放置后的目录结构**：
+
+```
+CzAuto/
+├── client-service-app/     ← 前端 + 后端（在此目录执行 pnpm install）
+├── react-hook-form/        ← 本地依赖（与 client-service-app 平级，必须是这个名字）
+└── deploy/
+```
+
+**验证**：`pnpm install` 时如果报错找不到 `file:..\react-hook-form`，说明目录未放置或路径不对——检查 `react-hook-form/package.json` 是否存在即可。
+
+> **为什么这样做**：项目 fork 了 react-hook-form 并做定制（配合 React 19 使用），无法直接使用 npm 官方包。因此它作为本地依赖存在于仓库外，部署时需手动放置（Docker 构建同理，见 DEPLOY.md）。
 
 ### 步骤
 
@@ -106,6 +145,24 @@ npx tsx relay-server/index.ts  # relay
 | 前端表单 | http://localhost:3001 |
 | 管理后台 | http://localhost:3002/admin |
 | relay | http://localhost:3003 |
+
+## 定时任务（Crons）
+
+后端内置 5 个定时任务，随后端进程启动（`src/server/index.ts` 中挂载）：
+
+| 任务 | 周期 | 作用 | 配置项 |
+|------|------|------|--------|
+| **入站监控** | 每 30s | 拉取中转邮箱新申请 → 校验 → 入库 → 转发服务商 | `INBOUND_POLL_INTERVAL` |
+| **回件监控** | 每 30s | 拉取 400cz 邮箱服务商回复 → 线程关联 → 确认/拒绝判定 | `POLL_INTERVAL`（固定 30s）|
+| **补偿任务** | 每 5 分钟 | 重发失败邮件（上限 5 次，状态感知过滤）| `COMPENSATE_INTERVAL` |
+| **超时提醒** | 每 1 小时 | 扫描 pending/unclear 超 24h 的申请 → 邮件提醒售后 | `TIMEOUT_CHECK_INTERVAL` / `PENDING_TIMEOUT_HOURS` |
+| **附件清理** | 每 24 小时 | 清理孤儿/空文件/已完成超期附件（启动时立即执行一次）| `CLEAN_INTERVAL` / `CLEAN_EXPIRED_DAYS` 等 |
+
+**说明**：
+- 全部为**进程内定时器**（`setInterval`），随后端进程运行，无需外部 cron
+- 监控类任务失败不中断（异常捕获 + 日志），并有健康检查接口 `GET /api/admin/health` 展示监控状态
+- 附件清理删除前记录日志（文件名+原因），单次上限 `CLEAN_MAX_PER_RUN` 防误删
+- 入站处理失败自动重试（最多 3 次），连续失败发告警邮件给售后
 
 ## 部署
 
