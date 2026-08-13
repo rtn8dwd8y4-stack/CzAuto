@@ -1,0 +1,241 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客户服务申请系统 - 架构流程图（详细版）</title>
+<style>
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f5f7fa; color: #333; padding: 20px; }
+  .wrap { max-width: 1860px; margin: 0 auto; }
+  .title { text-align: center; margin-bottom: 4px; }
+  .title h1 { font-size: 24px; margin: 0 0 4px; }
+  .title p { color: #888; font-size: 13px; margin: 0; }
+  .legend { text-align: center; margin: 10px 0; font-size: 13px; }
+  .legend span { margin: 0 18px; }
+  .legend .solid { font-weight: bold; color: #4a6fa5; }
+  .legend .dashed { font-weight: bold; color: #999; }
+  .mech-table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-top: 18px; }
+  .mech-table th, .mech-table td { border: 1px solid #e3e8ef; padding: 8px 12px; text-align: left; }
+  .mech-table th { background: #f0f4f9; font-weight: bold; }
+  .mech-table td:first-child { font-weight: bold; color: #1a4a77; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">
+    <h1>客户服务申请系统 · 架构流程图（含程序设计机制）</h1>
+    <p>邮件驱动架构 · 前端零存储 · 内网隔离 · 2026-08-10</p>
+  </div>
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="1820" height="1420" viewBox="0 0 1820 1420" font-family="Microsoft YaHei, PingFang SC, sans-serif">
+    <defs>
+      <marker id="arrS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4a6fa5"/></marker>
+      <marker id="arrD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#999"/></marker>
+    </defs>
+
+    <!-- ═══════ 区域背景 ═══════ -->
+    <rect x="30" y="60" width="390" height="780" rx="14" fill="#eef4fb" stroke="#a9c8e8" stroke-width="2" stroke-dasharray="8,5"/>
+    <rect x="120" y="50" width="210" height="28" rx="14" fill="#fff" stroke="#a9c8e8" stroke-width="1.5"/>
+    <text x="225" y="69" text-anchor="middle" font-size="14" font-weight="bold" fill="#2b5d8a">🌐 公网区（零敏感数据）</text>
+
+    <rect x="450" y="60" width="360" height="780" rx="14" fill="#fdf6e3" stroke="#e6b84c" stroke-width="2"/>
+    <rect x="520" y="50" width="220" height="28" rx="14" fill="#fff" stroke="#e6b84c" stroke-width="1.5"/>
+    <text x="630" y="69" text-anchor="middle" font-size="14" font-weight="bold" fill="#8a6d1a">📮 邮箱枢纽</text>
+
+    <rect x="840" y="60" width="950" height="1180" rx="14" fill="#eef9f0" stroke="#8fcd9f" stroke-width="2"/>
+    <rect x="1170" y="50" width="290" height="28" rx="14" fill="#fff" stroke="#8fcd9f" stroke-width="1.5"/>
+    <text x="1315" y="69" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d4f">🔒 隔离内网（不对外暴露）</text>
+
+    <!-- ═══════ 公网区节点 ═══════ -->
+    <rect x="55" y="110" width="340" height="80" rx="10" fill="#fff" stroke="#337ab7" stroke-width="1.5"/>
+    <text x="225" y="136" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#222">👤 用户浏览器</text>
+    <text x="225" y="160" text-anchor="middle" font-size="12.5" fill="#555">填写申请表单 · 上传附件（申请书/免责声明/营业执照）</text>
+
+    <rect x="55" y="240" width="340" height="140" rx="10" fill="#fff" stroke="#337ab7" stroke-width="2"/>
+    <text x="225" y="266" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1a4a77">🖥️ 前端表单（无状态）</text>
+    <text x="225" y="290" text-anchor="middle" font-size="12.5" fill="#555">向导式表单收集 + 本地校验（域名格式正则）</text>
+    <text x="225" y="310" text-anchor="middle" font-size="12.5" fill="#555">附件转 base64 · 模板静态下载 /templates/</text>
+    <text x="225" y="340" text-anchor="middle" font-size="12" font-weight="bold" fill="#d9534f">❌ 无数据库 · 提交即清空 · 零存储</text>
+    <text x="225" y="362" text-anchor="middle" font-size="11.5" fill="#999">机制：提交成功才进入成功页（真提交）</text>
+
+    <rect x="55" y="430" width="340" height="180" rx="10" fill="#fff" stroke="#d9534f" stroke-width="2"/>
+    <text x="225" y="456" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#b23c3c">📨 relay 投递员（微网关）</text>
+    <text x="225" y="480" text-anchor="middle" font-size="12.5" fill="#555">HTTP→SMTP 协议转换 · 组装标准邮件</text>
+    <text x="225" y="500" text-anchor="middle" font-size="12.5" fill="#555">主题含 RHF-编号 · 正文含 JSON 协议块</text>
+    <text x="225" y="524" text-anchor="middle" font-size="12" fill="#4a6fa5">机制①：CORS 白名单（RELAY_ALLOWED_ORIGINS）</text>
+    <text x="225" y="544" text-anchor="middle" font-size="12" fill="#4a6fa5">机制②：限流（每分钟 N 次，默认可调）</text>
+    <text x="225" y="568" text-anchor="middle" font-size="12" font-weight="bold" fill="#d9534f">仅持中转邮箱发信凭证 · 无存储 · 无 IMAP</text>
+    <text x="225" y="590" text-anchor="middle" font-size="11.5" fill="#999">机制③：发送即返回 submitId，失败报错不假成功</text>
+
+    <!-- ═══════ 邮箱枢纽节点 ═══════ -->
+    <rect x="475" y="330" width="310" height="160" rx="10" fill="#fff" stroke="#d9a400" stroke-width="2"/>
+    <text x="630" y="354" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#8a6d1a">📥 中转邮箱</text>
+    <text x="630" y="376" text-anchor="middle" font-size="13" font-weight="bold" fill="#8a6d1a">cz@coremail.cc</text>
+    <text x="630" y="398" text-anchor="middle" font-size="12.5" fill="#555">公司企邮专用账号（c3.icoremail.net）</text>
+    <text x="630" y="420" text-anchor="middle" font-size="12.5" fill="#555">🔑 客户端专用密码 · 🚫 禁网页登录</text>
+    <text x="630" y="450" text-anchor="middle" font-size="12" font-weight="bold" fill="#d9534f">仅承载 前端→后端 的数据传递</text>
+    <text x="630" y="470" text-anchor="middle" font-size="11.5" fill="#999">自发自收：relay 发 → 后端拉</text>
+
+    <rect x="475" y="530" width="310" height="130" rx="10" fill="#fff" stroke="#337ab7" stroke-width="1.5"/>
+    <text x="630" y="554" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1a4a77">📤 400cz@icoremail.cn</text>
+    <text x="630" y="578" text-anchor="middle" font-size="12.5" fill="#555">系统对外收发账号（115.236.118.131）</text>
+    <text x="630" y="600" text-anchor="middle" font-size="12.5" fill="#555">发服务商验证 · 收服务商回复 · 发售后通知</text>
+    <text x="630" y="628" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a4a77">凭证仅后端持有</text>
+    <text x="630" y="648" text-anchor="middle" font-size="11.5" fill="#999">机制：SMTP 重试 3 次（5s/30s/5min 退避）</text>
+
+    <rect x="475" y="710" width="310" height="80" rx="10" fill="#fff" stroke="#999" stroke-width="1.5" stroke-dasharray="6,4"/>
+    <text x="630" y="734" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#444">📧 服务商邮箱</text>
+    <text x="630" y="756" text-anchor="middle" font-size="12.5" fill="#555">客户库匹配代理商邮箱 · 失败走兜底</text>
+    <text x="630" y="776" text-anchor="middle" font-size="11.5" fill="#999">回复确认/拒绝 → 回至 400cz</text>
+
+    <!-- ═══════ 内网-入站链 ═══════ -->
+    <rect x="870" y="110" width="340" height="110" rx="10" fill="#fff" stroke="#337ab7" stroke-width="1.5"/>
+    <text x="1040" y="136" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1a4a77">① 入站监控（拉取+解析）</text>
+    <text x="1040" y="160" text-anchor="middle" font-size="12.5" fill="#555">IMAP :993 轮询中转邮箱（30s）</text>
+    <text x="1040" y="180" text-anchor="middle" font-size="12.5" fill="#555">解析协议块 → 字段/附件 → 主题过滤</text>
+    <text x="1040" y="204" text-anchor="middle" font-size="11.5" fill="#4a6fa5">机制④：幂等去重 inbound_processed 表</text>
+
+    <rect x="870" y="270" width="340" height="140" rx="10" fill="#fff" stroke="#337ab7" stroke-width="1.5"/>
+    <text x="1040" y="296" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1a4a77">② 安全校验</text>
+    <text x="1040" y="320" text-anchor="middle" font-size="12.5" fill="#555">机制⑤：发件人白名单（INBOUND_ALLOWED_SENDERS）</text>
+    <text x="1040" y="342" text-anchor="middle" font-size="12.5" fill="#555">机制⑥：submitId 格式 RHF-YYYYMMDD-XXXX</text>
+    <text x="1040" y="364" text-anchor="middle" font-size="12.5" fill="#555">机制⑦：serviceType 9 种合法值校验</text>
+    <text x="1040" y="386" text-anchor="middle" font-size="12.5" fill="#555">机制⑧：customerDomain 非空 · 附件 ≤ 5</text>
+
+    <rect x="870" y="460" width="340" height="90" rx="10" fill="#fff" stroke="#337ab7" stroke-width="1.5"/>
+    <text x="1040" y="486" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1a4a77">③ 申请入库</text>
+    <text x="1040" y="510" text-anchor="middle" font-size="12.5" fill="#555">MySQL 持久化（pending）· 附件落盘 uploads/</text>
+    <text x="1040" y="532" text-anchor="middle" font-size="11.5" fill="#999">submitId 冲突自动重生成重试一次</text>
+
+    <rect x="870" y="600" width="340" height="130" rx="10" fill="#fff" stroke="#57a773" stroke-width="2"/>
+    <text x="1040" y="626" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#2e7d4f">④ 域名校验 + 转发服务商</text>
+    <text x="1040" y="650" text-anchor="middle" font-size="12.5" fill="#555">域名 → 客户库 → 代理商匹配（resolveProviderEmail）</text>
+    <text x="1040" y="672" text-anchor="middle" font-size="12.5" fill="#555">失败走兜底邮箱 400cz@icoremail.cn</text>
+    <text x="1040" y="696" text-anchor="middle" font-size="12" fill="#4a6fa5">机制⑨：SMTP 失败自动重试 3 次（退避）</text>
+
+    <!-- ═══════ 内网-回件链 ═══════ -->
+    <rect x="1270" y="110" width="490" height="110" rx="10" fill="#fff" stroke="#337ab7" stroke-width="1.5"/>
+    <text x="1515" y="136" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1a4a77">⑤ 回件监控（服务商回复）</text>
+    <text x="1515" y="160" text-anchor="middle" font-size="12.5" fill="#555">IMAP :993 轮询 400cz 收件箱（30s）</text>
+    <text x="1515" y="182" text-anchor="middle" font-size="12.5" fill="#555">确认/拒绝关键词判定（双向关键词表）</text>
+    <text x="1515" y="204" text-anchor="middle" font-size="11.5" fill="#4a6fa5">机制⑩：高水位 UID 增量拉取（system_settings）</text>
+
+    <rect x="1270" y="270" width="490" height="130" rx="10" fill="#fff" stroke="#337ab7" stroke-width="1.5"/>
+    <text x="1515" y="296" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1a4a77">⑥ 线程关联（RFC 匹配）</text>
+    <text x="1515" y="322" text-anchor="middle" font-size="12.5" fill="#555">机制⑪：Message-ID 精确匹配（References 头）</text>
+    <text x="1515" y="346" text-anchor="middle" font-size="12.5" fill="#555">机制⑫：RHF-编号 / 主题匹配</text>
+    <text x="1515" y="370" text-anchor="middle" font-size="12.5" fill="#555">机制⑬：时间戳兜底 → 更新 verify_status</text>
+    <text x="1515" y="392" text-anchor="middle" font-size="11.5" fill="#999">仅匹配 verify_status=pending 的申请（幂等）</text>
+
+    <rect x="1270" y="450" width="490" height="110" rx="10" fill="#fff" stroke="#57a773" stroke-width="2"/>
+    <text x="1515" y="476" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#2e7d4f">⑦ 售后通知 / 客户通知</text>
+    <text x="1515" y="500" text-anchor="middle" font-size="12.5" fill="#555">确认 → 400cz 发完整业务信息 → support@coremail.cn</text>
+    <text x="1515" y="522" text-anchor="middle" font-size="12.5" fill="#555">拒绝 → 400cz 发通知 → 客户邮箱</text>
+    <text x="1515" y="546" text-anchor="middle" font-size="11.5" fill="#4a6fa5">机制⑭：失败可在后台手动重发（resend 接口）</text>
+
+    <!-- ═══════ 内网-数据/机制层 ═══════ -->
+    <rect x="870" y="620" width="890" height="0" rx="10" fill="none" stroke="none"/>
+
+    <rect x="1270" y="620" width="490" height="90" rx="10" fill="#fff" stroke="#888" stroke-width="1.5" stroke-dasharray="6,4"/>
+    <text x="1515" y="646" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#444">🗄️ MySQL（仅内网）</text>
+    <text x="1515" y="670" text-anchor="middle" font-size="12.5" fill="#555">applications / email_logs / customers / agents</text>
+    <text x="1515" y="692" text-anchor="middle" font-size="12.5" fill="#555">system_settings（白名单/水位）/ inbound_processed（去重）</text>
+
+    <!-- 机制面板 -->
+    <rect x="870" y="770" width="890" height="330" rx="12" fill="#fff" stroke="#57a773" stroke-width="2"/>
+    <text x="1315" y="798" text-anchor="middle" font-size="15" font-weight="bold" fill="#2e7d4f">🛡️ 后台保障机制（独立定时任务）</text>
+
+    <rect x="890" y="815" width="270" height="135" rx="8" fill="#f0fdf4" stroke="#8fcd9f" stroke-width="1"/>
+    <text x="1025" y="838" text-anchor="middle" font-size="13" font-weight="bold" fill="#2e7d4f">补偿任务（每 5 分钟）</text>
+    <text x="1025" y="860" text-anchor="middle" font-size="12" fill="#555">重发 email_logs 中 failed 的邮件</text>
+    <text x="1025" y="880" text-anchor="middle" font-size="12" fill="#555">上限 5 次 · 状态感知过滤</text>
+    <text x="1025" y="902" text-anchor="middle" font-size="11.5" fill="#999">已确认/已关闭的申请不再重发</text>
+    <text x="1025" y="922" text-anchor="middle" font-size="11.5" fill="#999">售后通知（support_team）始终补发</text>
+
+    <rect x="1180" y="815" width="270" height="135" rx="8" fill="#f0fdf4" stroke="#8fcd9f" stroke-width="1"/>
+    <text x="1315" y="838" text-anchor="middle" font-size="13" font-weight="bold" fill="#2e7d4f">超时提醒（每小时）</text>
+    <text x="1315" y="860" text-anchor="middle" font-size="12" fill="#555">扫描 verify_status=pending 超 24h 的申请</text>
+    <text x="1315" y="880" text-anchor="middle" font-size="12" fill="#555">自动发提醒邮件给售后</text>
+    <text x="1315" y="902" text-anchor="middle" font-size="11.5" fill="#999">每单只提醒一次（去重）</text>
+    <text x="1315" y="922" text-anchor="middle" font-size="11.5" fill="#999">阈值可用 PENDING_TIMEOUT_HOURS 调整</text>
+
+    <rect x="1470" y="815" width="270" height="135" rx="8" fill="#f0fdf4" stroke="#8fcd9f" stroke-width="1"/>
+    <text x="1605" y="838" text-anchor="middle" font-size="13" font-weight="bold" fill="#2e7d4f">健康检查</text>
+    <text x="1605" y="860" text-anchor="middle" font-size="12" fill="#555">/api/admin/health 返回监控状态</text>
+    <text x="1605" y="880" text-anchor="middle" font-size="12" fill="#555">400cz 监控 + 入站监控 最后成功时间</text>
+    <text x="1605" y="902" text-anchor="middle" font-size="11.5" fill="#999">>15 分钟无成功 → 判定异常</text>
+    <text x="1605" y="922" text-anchor="middle" font-size="11.5" fill="#999">后台顶部状态栏展示（30s 刷新）</text>
+
+    <rect x="890" y="965" width="850" height="115" rx="8" fill="#f0fdf4" stroke="#8fcd9f" stroke-width="1"/>
+    <text x="1315" y="988" text-anchor="middle" font-size="13" font-weight="bold" fill="#2e7d4f">🛠️ 管理后台（内网 :3002/admin · 同域托管）</text>
+    <text x="1315" y="1010" text-anchor="middle" font-size="12" fill="#555">申请列表（验证/邮件/处理三状态 + 5s 自动刷新）</text>
+    <text x="1315" y="1030" text-anchor="middle" font-size="12" fill="#555">申请详情（附件预览 · 邮件日志 · 失败重发 · 状态流转）</text>
+    <text x="1315" y="1050" text-anchor="middle" font-size="12" fill="#555">客户名单 / 代理商 / 白名单（CRUD + xlsx 批量导入）</text>
+    <text x="1315" y="1070" text-anchor="middle" font-size="11.5" fill="#999">watchdog 守护：15s 检查端口，挂掉自动拉起</text>
+
+    <!-- ═══════ 箭头：公网→邮箱→内网 ═══════ -->
+    <line x1="395" y1="520" x2="467" y2="415" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+    <rect x="380" y="438" width="120" height="22" rx="6" fill="#fff" stroke="#4a6fa5" stroke-width="1"/>
+    <text x="440" y="454" text-anchor="middle" font-size="12" font-weight="bold" fill="#4a6fa5">标准邮件 SMTP</text>
+
+    <line x1="785" y1="400" x2="862" y2="175" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+    <rect x="790" y="262" width="130" height="22" rx="6" fill="#fff" stroke="#4a6fa5" stroke-width="1"/>
+    <text x="855" y="278" text-anchor="middle" font-size="12" font-weight="bold" fill="#4a6fa5">IMAP 拉取</text>
+
+    <line x1="1210" y1="665" x2="793" y2="612" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+    <rect x="950" y="660" width="170" height="22" rx="6" fill="#fff" stroke="#4a6fa5" stroke-width="1"/>
+    <text x="1035" y="676" text-anchor="middle" font-size="12" font-weight="bold" fill="#4a6fa5">验证邮件（经 400cz）</text>
+
+    <line x1="630" y1="710" x2="630" y2="668" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+    <text x="650" y="700" font-size="12" fill="#4a6fa5" font-weight="bold">回复确认/拒绝</text>
+
+    <line x1="793" y1="610" x2="1262" y2="180" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+    <rect x="960" y="382" width="180" height="22" rx="6" fill="#fff" stroke="#4a6fa5" stroke-width="1"/>
+    <text x="1050" y="398" text-anchor="middle" font-size="12" font-weight="bold" fill="#4a6fa5">监控回件 IMAP</text>
+
+    <!-- 入站链内部箭头 -->
+    <line x1="1040" y1="220" x2="1040" y2="262" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+    <line x1="1040" y1="410" x2="1040" y2="452" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+    <line x1="1040" y1="550" x2="1040" y2="592" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+
+    <!-- 回件链内部箭头 -->
+    <line x1="1515" y1="220" x2="1515" y2="262" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+    <line x1="1515" y1="400" x2="1515" y2="442" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+
+    <!-- 虚线：MySQL 连接 -->
+    <line x1="1210" y1="505" x2="1262" y2="630" stroke="#999" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrD)"/>
+    <line x1="1210" y1="695" x2="1262" y2="660" stroke="#999" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrD)"/>
+    <line x1="1040" y1="730" x2="1040" y2="762" stroke="#999" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrD)"/>
+
+    <!-- 图例 -->
+    <line x1="700" y1="1300" x2="800" y2="1300" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arrS)"/>
+    <text x="820" y="1305" font-size="13" fill="#333">实线 = 邮件流转（SMTP / IMAP 通信）</text>
+    <line x1="1150" y1="1300" x2="1250" y2="1300" stroke="#999" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrD)"/>
+    <text x="1270" y="1305" font-size="13" fill="#333">虚线 = 数据库读写 / 后台管理访问（仅内网）</text>
+  </svg>
+
+  <!-- ═══════ 机制总表 ═══════ -->
+  <h2 style="text-align:center; font-size:17px; margin:26px 0 4px; color:#444;">程序设计机制总表</h2>
+  <p style="text-align:center; font-size:12px; color:#aaa; margin-bottom:12px;">共 14 项机制，编号与图中标注对应</p>
+  <table class="mech-table">
+    <tr><th style="width:90px">编号</th><th style="width:170px">机制</th><th>说明</th><th style="width:120px">配置项</th></tr>
+    <tr><td>①</td><td>relay CORS 白名单</td><td>仅允许指定来源（前端页面域名）调用 /api/submit，其他来源返回 403</td><td>RELAY_ALLOWED_ORIGINS</td></tr>
+    <tr><td>②</td><td>relay 请求限流</td><td>按 IP 每分钟限制提交次数，超出返回 429，防发信轰炸</td><td>RELAY_MAX_PER_MIN</td></tr>
+    <tr><td>③</td><td>提交非假成功</td><td>relay 发送失败时前端报错，不进入成功页（修复假成功 bug）</td><td>-</td></tr>
+    <tr><td>④</td><td>入站幂等去重</td><td>inbound_processed 表以 message_id 为主键，INSERT IGNORE 保证重启后不重复入库</td><td>inbound_processed 表</td></tr>
+    <tr><td>⑤</td><td>发件人白名单</td><td>仅接受白名单发件人的申请邮件，伪造发件人直接拦截（不入库）</td><td>INBOUND_ALLOWED_SENDERS</td></tr>
+    <tr><td>⑥</td><td>submitId 格式校验</td><td>必须匹配 RHF-YYYYMMDD-XXXX，防伪造编号</td><td>-</td></tr>
+    <tr><td>⑦</td><td>服务类型校验</td><td>serviceType 必须为 9 种合法值之一</td><td>-</td></tr>
+    <tr><td>⑧</td><td>必填与附件限制</td><td>customerDomain 非空；附件 ≤ 5 个防附件轰炸</td><td>MAX_ATTACHMENTS</td></tr>
+    <tr><td>⑨</td><td>发送自动重试</td><td>SMTP 发送失败自动重试 3 次（5s / 30s / 5min 指数退避）</td><td>sendEmail(retryTimes)</td></tr>
+    <tr><td>⑩</td><td>高水位增量拉取</td><td>回件监控记录最后处理 UID，重启不丢，避免全量扫描 15 万封</td><td>system_settings 表</td></tr>
+    <tr><td>⑪⑫⑬</td><td>线程关联三层匹配</td><td>Message-ID 精确 → RHF 编号/主题 → 时间戳兜底，保证回件与原始申请一一对应</td><td>-</td></tr>
+    <tr><td>⑭</td><td>手动重发</td><td>管理后台对 failed 邮件一键重发（状态感知：已确认/已关闭拒绝重发）</td><td>POST /emails/:id/resend</td></tr>
+    <tr><td>+</td><td>补偿任务</td><td>每 5 分钟扫描 failed 邮件自动重发（上限 5 次，状态感知过滤）</td><td>COMPENSATE_INTERVAL</td></tr>
+    <tr><td>+</td><td>超时提醒</td><td>每小时扫描 pending 超 24h 申请，自动发提醒给售后（每单只提醒一次）</td><td>PENDING_TIMEOUT_HOURS</td></tr>
+    <tr><td>+</td><td>健康检查</td><td>/api/admin/health 返回两个监控状态，后台顶部状态栏展示，15 分钟异常判定</td><td>-</td></tr>
+    <tr><td>+</td><td>watchdog 守护</td><td>每 15 秒检查三服务端口，挂掉自动拉起（start-all.ps1 一键启动）</td><td>scripts/watchdog.ps1</td></tr>
+  </table>
+</div>
+</body>
+</html>

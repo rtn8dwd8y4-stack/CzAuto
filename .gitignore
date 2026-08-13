@@ -1,0 +1,34 @@
+# 依赖
+node_modules/
+**/node_modules/
+
+# 构建产物
+dist/
+dist-admin/
+**/dist/
+
+# 环境变量（含密码凭证，绝不提交）
+.env
+*.env
+!deploy/.env.example
+
+# 运行时数据（客户敏感附件）
+uploads/
+**/uploads/
+logs/
+**/logs/
+
+# 证书（含私钥）
+certs/
+**/certs/
+
+# 本地依赖库（构建时需要单独放置，见 README）
+react-hook-form/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+npm-debug.log*

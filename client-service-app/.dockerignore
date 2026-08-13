@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+*.log
+.env
+uploads
+data
+Dockerfile
+docker-compose.yml
+docs
+reports
+e2e

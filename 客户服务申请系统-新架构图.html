@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客户服务申请系统 - 部署架构图（Mermaid）</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #f5f7fa;
+    color: #333;
+    padding: 30px 20px;
+  }
+  h1 { text-align: center; font-size: 24px; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: #888; font-size: 13px; margin-bottom: 24px; }
+  .diagram {
+    background: #fff;
+    border: 1px solid #e3e8ef;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    overflow-x: auto;
+  }
+  .diagram svg { max-width: 100%; height: auto; margin: 0 auto; display: block; }
+  .legend {
+    text-align: center;
+    font-size: 13px;
+    color: #555;
+    margin-top: 14px;
+    background: #f8fafc;
+    border: 1px solid #e3e8ef;
+    border-radius: 8px;
+    padding: 8px;
+    display: inline-block;
+  }
+  .legend-wrap { text-align: center; }
+  .legend .solid { color: #333; font-weight: bold; }
+  .legend .dashed { color: #666; font-weight: bold; }
+  .code-block {
+    max-width: 1400px;
+    margin: 20px auto 0;
+    background: #1e2430;
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .code-block pre {
+    margin: 0;
+    color: #d4e0f0;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .copy-btn {
+    display: block;
+    margin: 16px auto 0;
+    background: #337ab7;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 22px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { background: #286090; }
+</style>
+</head>
+<body>
+
+<h1>客户服务申请系统 - 部署架构图</h1>
+<div class="subtitle">前后端独立部署 · 中转邮箱收发的邮件驱动架构（Mermaid 渲染）</div>
+
+<div class="diagram">
+<pre class="mermaid">
+%%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 55, "rankSpacing": 110}}}%%
+flowchart LR
+    subgraph PUBLIC["🌐 公网区（零敏感数据）"]
+        direction TB
+        U["👤 用户浏览器<br/>填写表单 · 上传附件"]
+        FE["🖥️ 前端应用（无状态）<br/>• 表单收集与本地校验<br/>• 组装标准邮件格式<br/>• SMTP 发送中转邮箱<br/>• 提交即清空 · 零存储"]
+        U --> FE
+    end
+
+    subgraph MBX["📮 中转邮箱（公司企邮专用账号）"]
+        direction TB
+        MB["中转邮箱<br/>公司企邮专用账号<br/>🔑 仅客户端专用密码<br/>🚫 禁用网页登录<br/>仅系统自动收发"]
+        AG["📧 代理商邮箱"]
+    end
+
+    subgraph INTRA["🔒 隔离内网（不对外暴露）"]
+        direction TB
+        IM["② 邮件拉取与解析<br/>IMAP :993 轮询中转邮箱<br/>按标准格式解析字段<br/>提取附件（申请书/免责声明等）"]
+        DB1["③ 申请入库<br/>创建申请记录（pending）<br/>原始邮件归档 · 状态可追踪"]
+        VAL["④ 域名与代理商校验<br/>域名 → 客户库匹配<br/>客户 → 代理商匹配<br/>匹配失败走兜底邮箱"]
+        FWD["⑤ 转发至代理商<br/>生成 RHF-编号唯一标识<br/>携带申请表附件<br/>SMTP 发送验证邮件"]
+        THR["⑥ 回复线程关联<br/>Message-ID 精确匹配<br/>RHF-编号/主题匹配<br/>时间戳兜底"]
+        ASM["⑦ 完整业务信息组装<br/>原始请求 + 代理商确认<br/>解析确认/拒绝关键词<br/>附全部附件"]
+        SUPPORT["⑧ 客服通知<br/>确认 → 转发售后邮箱<br/>拒绝 → 通知客户"]
+        MYSQL[("MySQL<br/>客户/代理商/申请记录<br/>仅内网访问")]
+        ADMIN["🛠️ 管理后台<br/>申请查询 · 名单维护<br/>仅内网访问"]
+
+        IM --> DB1 --> VAL --> FWD --> THR --> ASM --> SUPPORT
+        DB1 -.-> MYSQL
+        VAL -.-> MYSQL
+        THR -.-> MYSQL
+        ADMIN -. "查询/配置" .-> VAL
+        ADMIN -.-> MYSQL
+    end
+
+    FE --"① 标准邮件 SMTP:465"--> MB
+    MB --"② 拉取 IMAP:993"--> IM
+    FWD --"⑤ 验证邮件 SMTP"--> AG
+    AG --"回复 确认/拒绝"--> MB
+    MB --"⑥ 监控回件 IMAP:993"--> THR
+</pre>
+<div class="legend-wrap">
+  <div class="legend">
+    <span class="solid">实线 ─▶ 邮件流转（SMTP / IMAP 通信）</span>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <span class="dashed">虚线 ┄▶ 数据库读写与后台管理访问（仅内网）</span>
+  </div>
+</div>
+</div>
+
+<button class="copy-btn" onclick="copyCode()">复制 Mermaid 源码</button>
+
+<div class="code-block">
+<pre id="mermaid-src">%%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 55, "rankSpacing": 110}}}%%
+flowchart LR
+    subgraph PUBLIC["🌐 公网区（零敏感数据）"]
+        direction TB
+        U["👤 用户浏览器<br/>填写表单 · 上传附件"]
+        FE["🖥️ 前端应用（无状态）<br/>• 表单收集与本地校验<br/>• 组装标准邮件格式<br/>• SMTP 发送中转邮箱<br/>• 提交即清空 · 零存储"]
+        U --> FE
+    end
+
+    subgraph MBX["📮 中转邮箱（公司企邮专用账号）"]
+        direction TB
+        MB["中转邮箱<br/>公司企邮专用账号<br/>🔑 仅客户端专用密码<br/>🚫 禁用网页登录<br/>仅系统自动收发"]
+        AG["📧 代理商邮箱"]
+    end
+
+    subgraph INTRA["🔒 隔离内网（不对外暴露）"]
+        direction TB
+        IM["② 邮件拉取与解析<br/>IMAP :993 轮询中转邮箱<br/>按标准格式解析字段<br/>提取附件（申请书/免责声明等）"]
+        DB1["③ 申请入库<br/>创建申请记录（pending）<br/>原始邮件归档 · 状态可追踪"]
+        VAL["④ 域名与代理商校验<br/>域名 → 客户库匹配<br/>客户 → 代理商匹配<br/>匹配失败走兜底邮箱"]
+        FWD["⑤ 转发至代理商<br/>生成 RHF-编号唯一标识<br/>携带申请表附件<br/>SMTP 发送验证邮件"]
+        THR["⑥ 回复线程关联<br/>Message-ID 精确匹配<br/>RHF-编号/主题匹配<br/>时间戳兜底"]
+        ASM["⑦ 完整业务信息组装<br/>原始请求 + 代理商确认<br/>解析确认/拒绝关键词<br/>附全部附件"]
+        SUPPORT["⑧ 客服通知<br/>确认 → 转发售后邮箱<br/>拒绝 → 通知客户"]
+        MYSQL[("MySQL<br/>客户/代理商/申请记录<br/>仅内网访问")]
+        ADMIN["🛠️ 管理后台<br/>申请查询 · 名单维护<br/>仅内网访问"]
+
+        IM --> DB1 --> VAL --> FWD --> THR --> ASM --> SUPPORT
+        DB1 -.-> MYSQL
+        VAL -.-> MYSQL
+        THR -.-> MYSQL
+        ADMIN -. "查询/配置" .-> VAL
+        ADMIN -.-> MYSQL
+    end
+
+    FE --"① 标准邮件 SMTP:465"--> MB
+    MB --"② 拉取 IMAP:993"--> IM
+    FWD --"⑤ 验证邮件 SMTP"--> AG
+    AG --"回复 确认/拒绝"--> MB
+    MB --"⑥ 监控回件 IMAP:993"--> THR</pre>
+</div>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'default', flowchart: { curve: 'linear', nodeSpacing: 45, rankSpacing: 70 } });
+
+  function copyCode() {
+    const code = document.getElementById('mermaid-src').innerText;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(() => alert('Mermaid 源码已复制'));
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('Mermaid 源码已复制');
+    }
+  }
+</script>
+
+</body>
+</html>

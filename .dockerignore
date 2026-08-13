@@ -1,0 +1,15 @@
+**/node_modules
+.git
+*.log
+*.env
+deploy/data
+docs
+reports
+e2e
+**/react-hook-form/node_modules
+**/react-hook-form/.git
+uploads
+**/uploads
+client-service-app/dist
+*.xlsx
+*.csv

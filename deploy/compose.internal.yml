@@ -1,0 +1,67 @@
+# 内网部署：MySQL + 后端（含管理后台托管）
+# 用法: docker compose -f compose.internal.yml up -d --build
+# 注意: 首次部署后需迁移数据（见 deploy/DEPLOY.md 5.2）
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cz-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS:?DB_PASS 必须配置}
+      MYSQL_DATABASE: client_service
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3306:3306"   # 仅本机回环，防止外部直连数据库
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASS}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: backend
+    container_name: cz-backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PORT: 3002
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: ${DB_PASS:?}
+      DB_NAME: client_service
+      SMTP_HOST: ${SMTP_HOST:?}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:?}
+      SMTP_PASS: ${SMTP_PASS:?}
+      SMTP_FROM: ${SMTP_FROM:?}
+      IMAP_HOST: ${IMAP_HOST:?}
+      IMAP_PORT: ${IMAP_PORT:-993}
+      IMAP_USER: ${IMAP_USER:?}
+      IMAP_PASS: ${IMAP_PASS:?}
+      INBOUND_IMAP_HOST: ${INBOUND_IMAP_HOST:?}
+      INBOUND_IMAP_PORT: ${INBOUND_IMAP_PORT:-993}
+      INBOUND_IMAP_USER: ${INBOUND_IMAP_USER:?}
+      INBOUND_IMAP_PASS: ${INBOUND_IMAP_PASS:?}
+      INBOUND_ALLOWED_SENDERS: ${INBOUND_ALLOWED_SENDERS:-cz@coremail.cc}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL:?}
+      FALLBACK_EMAIL: ${FALLBACK_EMAIL:?}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?}
+      UPLOADS_DIR: /app/uploads
+      ADMIN_DIST: /app/dist-admin
+      CLEAN_INTERVAL: ${CLEAN_INTERVAL:-86400000}
+      CLEAN_EXPIRED_ENABLED: ${CLEAN_EXPIRED_ENABLED:-true}
+      CLEAN_EXPIRED_DAYS: ${CLEAN_EXPIRED_DAYS:-1}
+      CLEAN_MAX_PER_RUN: ${CLEAN_MAX_PER_RUN:-500}
+    volumes:
+      - ./data/uploads:/app/uploads
+    ports:
+      - "3002:3002"   # 内网访问（同事通过 http://内网IP:3002/admin）

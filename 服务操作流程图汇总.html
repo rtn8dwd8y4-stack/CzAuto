@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>服务操作流程图汇总</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  body { font-family:-apple-system,"Microsoft YaHei",sans-serif; background:#f5f7fa; margin:0; padding:24px; color:#263238; }
+  main { max-width:1800px; margin:auto; }
+  h1 { text-align:center; font-size:34px; margin:0 0 24px; }
+  h2 { color:#0277bd; border-left:6px solid #0277bd; padding-left:14px; margin-top:42px; font-size:27px; }
+  h3 { font-size:21px; color:#455a64; }
+  .notice { background:#fff3e0; border-left:6px solid #fb8c00; padding:16px 20px; font-size:19px; line-height:1.7; border-radius:6px; }
+  .notice.blue { background:#e3f2fd; border-left-color:#1976d2; }
+  .notice.red { background:#ffebee; border-left-color:#d32f2f; }
+  .notice.green { background:#e8f5e9; border-left-color:#2e7d32; }
+  .mermaid { background:#fff; padding:30px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.08); margin-bottom:28px; overflow-x:auto; }
+  .mermaid svg { display:block; max-width:none !important; }
+  table { width:100%; border-collapse:collapse; margin:18px 0; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.06); font-size:17px; }
+  th, td { border:1px solid #cfd8dc; padding:10px 14px; text-align:left; vertical-align:top; }
+  th { background:#0277bd; color:#fff; font-weight:600; }
+  tr:nth-child(even) td { background:#f8fafc; }
+  tr.highlight td { background:#fff8e1; }
+  .tag { display:inline-block; padding:2px 10px; border-radius:12px; background:#e3f2fd; color:#1565c0; font-size:14px; }
+  .tag.oem { background:#fce4ec; color:#ad1457; }
+  @media print {
+    @page { size: A3 landscape; margin: 10mm; }
+    body { background:#fff; padding:0; }
+    main { max-width:none; width:100%; }
+    h1 { font-size:24px; }
+    h2 { font-size:20px; break-after:avoid; page-break-after:avoid; }
+    h3 { font-size:16px; break-after:avoid; page-break-after:avoid; }
+    .notice { font-size:13px; box-shadow:none; break-inside:avoid; page-break-inside:avoid; }
+    .mermaid { overflow:visible; padding:10px; box-shadow:none; break-inside:avoid; page-break-inside:avoid; }
+    .mermaid svg { width:100% !important; max-width:100% !important; height:auto !important; }
+    table { font-size:11px; box-shadow:none; break-inside:auto; }
+    tr { break-inside:avoid; page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body><main>
+<h1>服务操作流程图</h1>
+<p class="notice">本文件汇总各项服务操作流程。请滚动查看。如需打印，建议在浏览器中按 Ctrl+P 选择“另存为 PDF”。</p>
+
+<h2>一、重置密码流程</h2>
+<p class="notice"><b>资料要求：</b>重置密码属于需提交申请书的服务。企业客户须提供盖章、签名及手写日期的管理员密码取回申请表；个人邮箱注册客户还须提供身份证扫描（复印）件。资料经销售或代理商审核后转交 400CZ 操作。</p>
+
+<h3>第一阶段：受理、资料准备与初审</h3>
+<div class="mermaid">
+flowchart LR
+ A([Support 收到<br/>客户重置密码请求]) --> B[Support 发送<br/>管理员密码取回申请表]
+ B --> C[客户填写申请表<br/>签名及日期须手写<br/>加盖清晰公司公章]
+ C --> D{客户类型?}
+ D -->|企业客户| E[附盖章申请表<br/>及营业执照复印/扫描件]
+ D -->|个人邮箱注册| F[附申请表<br/>及身份证扫描/复印件]
+ E --> G[客户回复资料至<br/>Support 邮箱]
+ F --> G
+ G --> H[Support 检查资料完整性<br/>核对组织是否存在<br/>检查盖章、签名、日期]
+ H --> I{资料完整有效?}
+ I -->|否| J[通知客户<br/>补充或更正资料] --> C
+ I -->|是| K[Support 将申请及资料<br/>转交销售/代理商审核<br/>抄送 CZ 邮箱]
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style J fill:#ffebee,stroke:#d32f2f
+ style K fill:#fff3e0,stroke:#fb8c00,stroke-width:2px
+</div>
+
+<h3>第二阶段：销售/代理商确认与 CZ 定位平台</h3>
+<div class="mermaid">
+flowchart LR
+ A[销售/代理商<br/>核实客户与申请信息] --> B{审核是否通过?}
+ B -->|否| C[退回 Support<br/>联系客户补充资料]
+ B -->|是| D[销售/代理商确认申请<br/>代理商须使用接口邮箱回复]
+ D --> E[将确认邮件和资料<br/>发送/抄送 400CZ]
+ E --> F[400CZ 收到确认]
+ F --> G[打开 clientoption.html<br/>查询用户所属平台]
+ G --> H[确认对应管理后台<br/>例如 C1 后台]
+ style C fill:#ffebee,stroke:#d32f2f
+ style H fill:#fff3e0,stroke:#fb8c00,stroke-width:2px
+</div>
+
+<h3>第三阶段：后台重置、安全处理与通知</h3>
+<div class="mermaid">
+flowchart LR
+ A[登录客户所属后台] --> B[组织与用户<br/>组织管理<br/>管理该组织用户]
+ B --> C[进入客户组织<br/>管理员管理]
+ C --> D[找到目标管理员账号]
+ D --> E[进入「用户密码」<br/>输入随机高强度新密码]
+ E --> F{邮箱状态是否锁定?}
+ F -->|是| G[将用户状态改为正常]
+ F -->|否| H[解绑客户二次验证]
+ G --> H
+ H --> I[保存修改]
+ I --> J[使用 support@coremail.cn<br/>发送新密码至申请表指定邮箱<br/>主题：重置管理员<br/>不得抄送任何邮箱]
+ J --> K[400CZ 回复销售/代理商<br/>及 Support 邮件<br/>告知已按申请完成重置]
+ K --> L([流程完成])
+ style L fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<h2>二、如何自助找回密码</h2>
+<div class="mermaid">
+flowchart LR
+ A([用户无法登录]) --> B[打开所属平台<br/>例如 c2.icoremail.net]
+ B --> C[点击「忘记密码」]
+ C --> D{是否已绑定<br/>手机或备用邮箱?}
+ D -->|已绑定手机| E[选择短信找回]
+ D -->|已绑定备用邮箱| F[选择备用邮箱找回]
+ D -->|均未绑定| G[无法自助找回<br/>联系管理员或按重置密码流程申请]
+ E --> H[完成验证码验证]
+ F --> H
+ H --> I[设置符合强度要求的新密码]
+ I --> J([自助找回成功])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style G fill:#fff3e0,stroke:#fb8c00,stroke-width:2px
+ style J fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+<p class="notice blue"><b>提前配置：</b>手机绑定位置为“网页端 → 高级功能 → 手机绑定”；备用邮箱位置为“网页端 → 个人信息 → 填写备用邮件地址”。</p>
+
+<h2>三、更改域名流程</h2>
+<div class="mermaid">
+flowchart LR
+ A([Support 收到<br/>客户更改域名申请]) --> B[提供更改域名申请表<br/>需附带免责声明 + 营业执照]
+ B --> C[客户填写并回复<br/>转销售/代理商审核确认]
+ C --> D{审核是否通过?}
+ D -->|否| E[退回客户<br/>补充或更正资料]
+ D -->|是| F[销售/代理商回复确认邮件<br/>抄送 CZ]
+ F --> G[CZ 登录 RSS<br/>报备信息列表<br/>新增副域名]
+ G --> H[客户列表 - 用域名搜索<br/>进入订购信息]
+ H --> I[填写新的域名<br/>点击修改域名]
+ I --> J[CZ 回复代理商邮件<br/>告知已完成更改]
+ J --> K([流程完成])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style E fill:#ffebee,stroke:#d32f2f
+ style K fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<h2>四、绑定多域名流程</h2>
+<div class="mermaid">
+flowchart LR
+ A([客户提交<br/>绑定多域名申请]) --> B[提供申请表给客户填写<br/>企业客户需附带营业执照]
+ B --> C[客户填写后回复一线<br/>转销售/代理商审核确认]
+ C --> D{审核是否通过?}
+ D -->|否| E[退回客户<br/>补充或更正资料]
+ D -->|是| F[销售/代理商回复确认<br/>抄送 CZ]
+ F --> G[CZ 在 RSS 报备信息列表<br/>输入客户信息查询<br/>点击进入新增副域名]
+ G --> H[登录 webadmin<br/>用域名/关键字搜索客户]
+ H --> I[进入组织<br/>在客户主域名下方<br/>直接添加新的多域名]
+ I --> J([绑定完成])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style E fill:#ffebee,stroke:#d32f2f
+ style J fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<h2>五、绑定域别名</h2>
+<div class="mermaid">
+flowchart LR
+ A([客户提交<br/>绑定域别名申请]) --> B[客户提供申请表<br/>企业客户需附带营业执照]
+ B --> C[销售/代理商审核确认<br/>抄送 CZ]
+ C --> D{审核是否通过?}
+ D -->|否| E[退回客户<br/>补充或更正资料]
+ D -->|是| F[销售/代理商在 RSS<br/>报备信息列表新增副域名]
+ F --> G[CZ 登录 webadmin<br/>系统设置 - 域名管理]
+ G --> H[输入域名 - 查询<br/>进入修改域名页]
+ H --> I[在「域别名设置」下方<br/>填写域别名 - 新建]
+ I --> J[绑定完成后<br/>回复代理商/销售邮件告知]
+ J --> K([绑定完成])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style E fill:#ffebee,stroke:#d32f2f
+ style K fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<h2>六、解绑多域名 & 解绑域别名</h2>
+<div class="mermaid">
+flowchart LR
+ A([客户提交<br/>解绑域名申请]) --> B[提供解绑申请表<br/>企业客户需附带营业执照]
+ B --> C[销售/代理商审核确认<br/>抄送 CZ]
+ C --> D{审核是否通过?}
+ D -->|否| E[退回客户<br/>补充或更正资料]
+ D -->|是| F{解绑类型?}
+ F -->|多域名| G[登录 webadmin<br/>组织与用户 - 组织管理<br/>在客户主域名下删除多域名]
+ F -->|域别名| H[登录 webadmin<br/>系统设置 - 域名管理<br/>在主域名下删除域别名]
+ G --> I([解绑完成])
+ H --> I
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style E fill:#ffebee,stroke:#d32f2f
+ style I fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<h2>七、更改组织名称</h2>
+<div class="mermaid">
+flowchart LR
+ A([客户提交<br/>更改组织名称申请]) --> B[提供申请表<br/>客户填写并附营业执照副本]
+ B --> C[销售/代理商<br/>审核确认]
+ C --> D{审核是否通过?}
+ D -->|否| E[退回客户<br/>补充或更正资料]
+ D -->|是| F[将确认邮件及资料<br/>发送至 400CZ 邮箱]
+ F --> G[CZ 登录 RSS<br/>客户列表 - 用域名搜索]
+ G --> H[进入订购信息<br/>点击「修改参数」]
+ H --> I[填写新的公司名称<br/>提交修改]
+ I --> J[CZ 回复销售/代理商<br/>告知操作完成]
+ J --> K([更改完成])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style E fill:#ffebee,stroke:#d32f2f
+ style K fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<h2>八、删除组织配置信息</h2>
+<p class="notice red"><b>处理规则：</b>过期 3 个月以上的客户可由 CZ 直接处理；过期 3 个月以内的客户须提交申请表和营业执照，经销售/代理商审核后再处理。所谓“删除”不是直接删除组织，而是在原域名后追加当天日期。</p>
+<div class="mermaid">
+flowchart LR
+ A([收到删除组织<br/>配置信息申请]) --> B{客户已过期多久?}
+ B -->|超过 3 个月| C[CZ 可直接受理<br/>无需申请书]
+ B -->|3 个月以内| D[客户提交申请表<br/>及营业执照]
+ D --> E[销售/代理商审核确认<br/>将资料转交 CZ]
+ C --> F[CZ 确认客户所属平台]
+ E --> F
+ F --> G[登录对应管理后台<br/>系统设置 - 域名管理]
+ G --> H[将当天日期追加到原域名后<br/>例如 tianfutea.cn20260701]
+ H --> I[保存修改]
+ I --> J[回复销售/代理商邮件<br/>告知已处理]
+ J --> K([处理完成])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style C fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+ style K fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<h2>九、延期</h2>
+<p class="notice">正常工作时间内不接受特殊延期申请；只有销售/代理商在 RSS 提交了延期订单后 CZ 才可操作。若特殊情况下已影响客户使用，CZ 可以在后台临时延期 2-3 天。</p>
+<div class="mermaid">
+flowchart LR
+ A([客户或销售/代理商<br/>提交延期申请]) --> B{申请类型?}
+ B -->|常规延期| C[销售/代理商在 RSS<br/>提交延期订单]
+ B -->|特殊情况<br/>已影响客户使用| D[CZ 后台临时延期<br/>一般为 2-3 天]
+ C --> E[CZ 根据 RSS 延期订单<br/>在后台执行延期]
+ D --> F[登录后台<br/>组织与用户<br/>进入该客户组织]
+ F --> G[编辑组织 - 更改到期时间]
+ G --> H[点击保存]
+ H --> I([延期完成])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style I fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<h2>十、解绑二次验证</h2>
+<h3>场景 A：客户不想要二次验证（觉得麻烦）</h3>
+<div class="mermaid">
+flowchart LR
+ A([客户提出取消<br/>二次验证请求]) --> B[Support/CZ 强烈建议客户保留绑定<br/>说明二次验证的安全价值]
+ B --> C{客户态度?}
+ C -->|同意保留| D[引导客户完成二次验证绑定<br/>流程结束]
+ C -->|坚持解绑| E[提供《免责声明》<br/>让客户填写并签字盖章]
+ E --> F[销售/代理商审核免责资料<br/>确认无误后转 400CZ]
+ F --> G[登录后台<br/>组织与用户 - 用户管理]
+ G --> H[搜索目标用户<br/>进入「用户密码」标签页]
+ H --> I[在二次验证区域<br/>点击解绑对应设备]
+ I --> J([解绑完成])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style D fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+ style J fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<h3>场景 B：客户更换手机或无法收到验证码</h3>
+<div class="mermaid">
+flowchart LR
+ A([客户更换手机或<br/>无法收到验证码]) --> B[客户提供《免责声明》申请<br/>附营业执照副本]
+ B --> C[Support 将申请转给销售确认]
+ C --> D[销售/代理商审核<br/>并在邮件中回复确认]
+ D --> E[CZ 收到销售确认邮件<br/>抄送 400CZ]
+ E --> F[登录后台<br/>组织与用户 - 用户管理]
+ F --> G[搜索目标用户<br/>进入「用户密码」标签页]
+ G --> H[在二次验证区域<br/>点击解绑对应设备]
+ H --> I([解绑完成])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style I fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<h2>十一、扩容量 & 扩容封数</h2>
+<h3>扩容量（接收人可直接后台操作，无需转 CZ）</h3>
+<p class="notice green">任何渠道（Support/电销/售后等）接收到客户扩容请求后，接收人可直接在自己权限内的后台操作扩容，无需转交 CZ。</p>
+<div class="mermaid">
+flowchart LR
+ A([客户提交<br/>邮箱扩容申请]) --> B[接收人确认<br/>客户组织与目标用户]
+ B --> C{扩容范围?}
+ C -->|整组织扩容| D[组织与用户 - 组织管理<br/>找到客户组织]
+ C -->|单/多用户扩容| E[管理该组织用户<br/>搜索目标用户]
+ D --> F[编辑组织<br/>增加「邮箱附加容量」<br/>保存]
+ E --> G[在用户页<br/>「邮箱容量」处<br/>增加所需容量 - 保存]
+ F --> H([扩容完成])
+ G --> H
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style H fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+<p class="notice blue"><b>经验值：</b>每个用户扩容 10G 即可，邮箱容量没有上限；售后/代理商代提需求时按标准 10G 处理。</p>
+
+<h3>扩容封数（无需申请书，CZ 提交操作）</h3>
+<p class="notice red">当客户封数达到上限（如老旧服务等级 G_Exp 仅 10w 上限），需要将组织服务等级手动改为标准等级（如 2013_default），封数上限变为 100w。</p>
+<div class="mermaid">
+flowchart LR
+ A([客户封数达到上限<br/>影响收信]) --> B[确认当前服务等级<br/>判断是否为老旧/受限等级]
+ B --> C[登录后台<br/>组织与用户 - 组织管理]
+ C --> D[按客户购买的用户数<br/>添加 2013_default 服务等级]
+ D --> E[管理该组织用户<br/>全选所有用户]
+ E --> F[高级 - 批量修改<br/>将服务等级改为 2013_default]
+ F --> G[保存批量修改]
+ G --> H[返回客户组织<br/>删除旧的服务等级<br/>例如 2013_default_so]
+ H --> I[核实用户数是否正确<br/>若数量较多可提交 cmsa 工单<br/>由 SA 批量处理]
+ I --> J([扩容封数完成])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style J fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+<p class="notice blue"><b>各大平台默认服务等级参考：</b><br>
+C1 = 2013_default ｜ C2 = 2013_default ｜ C3 = 缺省服务-C3 默认开通 ｜ C5 = 缺省服务-云享版默认开通<br>
+C7 = 缺省服务-C7 默认开通-标准版 / 缺省服务-C7 默认开通-尊享版 ｜ C8 = 缺省服务-C8 默认开通<br>
+C9 = C9-默认开通 ｜ C10 = 缺省服务 ｜ 校园邮箱 = 缺省服务<br>
+<b>OEM 客户（有合同限制）：</b>不要随意更改服务等级，例如一三八 = 138企业邮箱或138企业邮箱-100w；泛亚 = 泛亚OEM(18/21/25/22)；铭心 = 铭心科技-OEM 等。</p>
+
+<h2>十二、免责代理商</h2>
+<p class="notice green">已签署《免责声明》并做过业务授权的代理商，由其指定接口邮箱（ICM邮箱）发送的操作类申请可直接受理，无需再走销售审核。</p>
+
+<table>
+<thead>
+<tr><th>客户名称</th><th>版本</th><th>指定接口邮箱（ICM 邮箱）</th></tr>
+</thead>
+<tbody>
+<tr><td>泛亚信息技术江苏有限公司</td><td><span class="tag oem">OEM</span></td><td>help@bizcn.com</td></tr>
+<tr><td>广东广信通信服务有限公司</td><td><span class="tag oem">OEM</span></td><td>yewb@gz2000.net</td></tr>
+<tr><td>广东时代互联科技有限公司</td><td><span class="tag oem">OEM</span></td><td>jing@now.cn、kefu@now.cn、weihui@now.cn、support@tnet.chk、idc005@now.cn、sharon@now.cn、support@eranet.com、chen@now.cn</td></tr>
+<tr><td>广州广汽商贸物流有限公司</td><td><span class="tag">C1 专业版</span></td><td>admin@gbl-gz.com</td></tr>
+<tr><td>南京南瑞继保电气有限公司</td><td><span class="tag">专享版</span></td><td>admin@nrec.com、admin_l@nrec.com、admin_br@nrec.com</td></tr>
+<tr><td>上海爱驰亿维汽车销售有限公司</td><td><span class="tag">专享版</span></td><td>yingj.zhou@ai-ways.com（周颖 / 13621712572）、min.wang1@ai-ways.com（王敏 / 18917198889）、xiaoli.wu@ai-ways.com（武晓莉 / 13818096869）</td></tr>
+<tr><td>深圳市万维网信息技术有限公司</td><td><span class="tag oem">OEM</span></td><td>5566@szhot.com</td></tr>
+<tr class="highlight"><td>深圳市一三八计算机技术有限公司</td><td><span class="tag oem">OEM</span></td><td>138 &lt;icm00132@agent.coremail.cn&gt;</td></tr>
+<tr><td>苏州市轨道交通集团有限公司</td><td><span class="tag">C3</span></td><td>houshuai@sz-mtr.com</td></tr>
+<tr><td>PT Cyberindo Mega Persada（CBNCloud）</td><td><span class="tag">C6</span></td><td>info-mailenterprise@cbncloud.co.id</td></tr>
+<tr class="highlight"><td>金万邦</td><td><span class="tag oem">OEM</span></td><td>icm00113@agent.coremail.cn</td></tr>
+<tr class="highlight"><td>今科道同 / 金万邦</td><td><span class="tag oem">OEM</span></td><td>icm00103@agent.coremail.cn</td></tr>
+<tr class="highlight"><td>上海铭心</td><td><span class="tag oem">OEM</span></td><td>icm00101@agent.coremail.cn</td></tr>
+</tbody>
+</table>
+
+<div class="mermaid">
+flowchart LR
+ A([代理商指定接口邮箱<br/>发送操作类申请]) --> B{发件邮箱是否在<br/>免责代理商列表?}
+ B -->|否| C[按正常流程处理<br/>需销售/代理商审核]
+ B -->|是| D[直接受理申请<br/>无需销售/代理商再审核]
+ D --> E[CZ 按申请内容<br/>执行后台操作]
+ E --> F([操作完成<br/>回复代理商告知])
+ style A fill:#e1f5ff,stroke:#0277bd,stroke-width:2px
+ style C fill:#ffebee,stroke:#d32f2f
+ style F fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+</div>
+
+<script>
+mermaid.initialize({
+ startOnLoad:true,
+ theme:'default',
+ flowchart:{curve:'basis',htmlLabels:true,nodeSpacing:55,rankSpacing:75,wrappingWidth:190,useMaxWidth:false},
+ themeVariables:{fontSize:'23px',fontFamily:'-apple-system,"Microsoft YaHei",sans-serif',lineColor:'#607d8b'}
+});
+</script>
+</main></body>
+</html>

@@ -1,0 +1,414 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>客户服务申请系统 - 功能现状总览</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #fafafa;
+      --card: #fff;
+      --border: #e5e7eb;
+      --text: #1f2937;
+      --text2: #6b7280;
+      --text3: #9ca3af;
+      --blue: #2563eb;
+      --blue-bg: #eff6ff;
+      --amber: #d97706;
+      --amber-bg: #fffbeb;
+      --green: #059669;
+      --green-bg: #ecfdf5;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --purple: #7c3aed;
+      --purple-bg: #f5f3ff;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; font-size: 14px; }
+
+    .header { max-width: 1000px; margin: 0 auto; padding: 40px 24px 0; }
+    .header h1 { font-size: 24px; font-weight: 800; color: var(--text); }
+    .header .sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 32px 24px 48px; }
+    .sec { margin-bottom: 40px; }
+    .sec-num { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--blue); font-weight: 700; }
+    .sec-title { font-size: 20px; font-weight: 800; color: var(--text); margin: 4px 0 14px; }
+    .sec-desc { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+    .hr { height: 1px; background: var(--border); margin: 32px 0; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card { background: var(--card); border-radius: 8px; padding: 18px; border: 1px solid var(--border); }
+    .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .card p { font-size: 12px; color: var(--text2); line-height: 1.6; }
+    .card .tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; margin-bottom: 8px; }
+    .tag-blue { background: var(--blue-bg); color: var(--blue); }
+    .tag-amber { background: var(--amber-bg); color: var(--amber); }
+    .tag-green { background: var(--green-bg); color: var(--green); }
+    .tag-red { background: var(--red-bg); color: var(--red); }
+    .tag-purple { background: var(--purple-bg); color: var(--purple); }
+    .tag-gray { background: #f3f4f6; color: var(--text2); }
+
+    table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); font-size: 12px; }
+    th { background: #f9fafb; padding: 8px 10px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 8px 10px; color: var(--text); border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td .mono { font-family: 'Consolas', monospace; font-size: 11px; }
+    .st-done { color: var(--green); font-weight: 600; }
+    .st-todo { color: var(--amber); font-weight: 600; }
+    .st-none { color: var(--text3); }
+
+    .note { border-radius: 8px; padding: 14px 16px; margin: 12px 0; border-left: 3px solid; font-size: 12px; line-height: 1.7; }
+    .note-blue { background: var(--blue-bg); border-color: var(--blue); color: #1e40af; }
+    .note-amber { background: var(--amber-bg); border-color: var(--amber); color: #92400e; }
+    .note-green { background: var(--green-bg); border-color: var(--green); color: #065f46; }
+    .note-red { background: var(--red-bg); border-color: var(--red); color: #991b1b; }
+    .note strong { font-weight: 700; }
+
+    .pill { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; margin-right: 4px; }
+    .pill-col { background: var(--blue-bg); color: var(--blue); }
+    .pill-json { background: var(--purple-bg); color: var(--purple); }
+    .pill-file { background: var(--amber-bg); color: var(--amber); }
+
+    @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>客户服务申请系统 - 功能现状总览</h1>
+  <div class="sub">V1.0 · 2026年7月31日 · 系统当前实现情况与数据收集规范</div>
+</div>
+
+<div class="wrap">
+
+  <!-- 1. 已实现功能 -->
+  <div class="sec">
+    <div class="sec-num">01 / FEATURES</div>
+    <div class="sec-title">已实现功能</div>
+
+    <div class="grid-3">
+      <div class="card">
+        <span class="tag tag-blue">表单</span>
+        <h3>三步表单向导</h3>
+        <p>选择服务类型 → 填写申请信息 → 身份验证 → 确认提交</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-blue">校验</span>
+        <h3>客户域名白名单校验</h3>
+        <p>独立"客户域名"字段，与客户名单精确匹配 + 白名单兜底，未通过禁止提交</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-blue">后台</span>
+        <h3>许可域名管理后台</h3>
+        <p>/admin/customers 管理页面：许可域名列表（域名/公司名/联系人/状态）、新增/编辑/停用、搜索筛选，支持后续 CSV 批量导入</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-blue">条件</span>
+        <h3>企业/个人用户区分</h3>
+        <p>重置密码时选择用户类型，动态显示公司名称/营业执照（企业）或身份证（个人）</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-green">模板</span>
+        <h3>申请表模板下载</h3>
+        <p>9 种申请书模板 + 免责声明模板，解绑类支持多模板选择，下载后填写盖章上传</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-green">邮件</span>
+        <h3>真实 SMTP 邮件转发</h3>
+        <p>QQ 邮箱 SMTP 发送，营业执照/身份证/申请书/免责声明作为附件完整转发</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-green">识别</span>
+        <h3>RFC 邮件线程识别</h3>
+        <p>IMAP 每30秒轮询，通过 Message-ID / 主题申请编号匹配服务商回复，关键词判断确认/拒绝</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-purple">存储</span>
+        <h3>MySQL 数据持久化</h3>
+        <p>applications 表 30+ 字段独立存储 + email_logs 邮件日志表 + customers 客户名单表</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-purple">文件</span>
+        <h3>附件本地存储</h3>
+        <p>营业执照/身份证/申请书/免责声明保存至 uploads/ 目录，支持后台下载</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-blue">后台</span>
+        <h3>管理后台</h3>
+        <p>申请列表（筛选/搜索/分页/自动刷新）+ 详情（完整度检查/邮件日志/状态管理）+ 客户名单 + 白名单管理</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- 2. 服务类型收集信息 -->
+  <div class="sec">
+    <div class="sec-num">02 / DATA COLLECTION</div>
+    <div class="sec-title">各服务类型收集的信息与存储方式</div>
+    <div class="sec-desc">
+      存储方式标记：<span class="pill pill-col">独立列</span> 独立数据库字段
+      <span class="pill pill-json">JSON</span> JSON 数组字段
+      <span class="pill pill-file">附件</span> 上传文件（存 uploads/ 目录）
+      所有表单数据同时冗余保存于 form_data JSON 字段
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:130px;">服务类型</th>
+          <th>收集的信息</th>
+          <th style="width:170px;">附件（随邮件转发）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>重置管理员密码</strong><br><span class="mono" style="color:var(--text3);">resetPassword</span></td>
+          <td>
+            用户类型 <span class="pill pill-col">customer_type</span>（企业/个人下拉）<br>
+            公司名称 <span class="pill pill-col">form_data</span>（仅企业用户）<br>
+            需重置邮箱账号 <span class="pill pill-col">form_data</span><br>
+            新密码接收邮箱 <span class="pill pill-col">receive_email</span><br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span><br>
+            申请原因 <span class="pill pill-col">form_data</span>
+          </td>
+          <td>
+            营业执照（企业）<span class="pill pill-file">license</span><br>
+            身份证（个人）<span class="pill pill-file">identity</span><br>
+            免责声明 <span class="pill pill-file">disclaimer</span><br>
+            密码重置申请表 <span class="pill pill-file">application</span>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>自助找回密码</strong><br><span class="mono" style="color:var(--text3);">selfRetrievePassword</span></td>
+          <td>
+            客户名称 <span class="pill pill-col">form_data</span><br>
+            需找回密码邮箱 <span class="pill pill-col">form_data</span><br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span><br>
+            申请原因 <span class="pill pill-col">form_data</span>
+          </td>
+          <td>营业执照 <span class="pill pill-file">license</span></td>
+        </tr>
+        <tr>
+          <td><strong>更改域名</strong><br><span class="mono" style="color:var(--text3);">changeDomain</span></td>
+          <td>
+            公司名称 <span class="pill pill-col">form_data</span><br>
+            原域名 <span class="pill pill-col">form_data</span><br>
+            新域名 <span class="pill pill-col">form_data</span><br>
+            RSS是否已报备 <span class="pill pill-col">rss_confirmed</span>（选"否"拦截提交）<br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span><br>
+            申请原因 <span class="pill pill-col">form_data</span>
+          </td>
+          <td>营业执照 <span class="pill pill-file">license</span><br>申请表 <span class="pill pill-file">application</span></td>
+        </tr>
+        <tr>
+          <td><strong>绑定多域名</strong><br><span class="mono" style="color:var(--text3);">bindMultiDomain</span></td>
+          <td>
+            公司名称 <span class="pill pill-col">form_data</span><br>
+            主域名 <span class="pill pill-col">form_data</span><br>
+            新增副域名列表 <span class="pill pill-json">sub_domains</span><br>
+            RSS是否已报备 <span class="pill pill-col">rss_confirmed</span><br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span><br>
+            申请原因 <span class="pill pill-col">form_data</span>
+          </td>
+          <td>营业执照 <span class="pill pill-file">license</span><br>申请表 <span class="pill pill-file">application</span></td>
+        </tr>
+        <tr>
+          <td><strong>绑定域别名</strong><br><span class="mono" style="color:var(--text3);">bindDomainAlias</span></td>
+          <td>
+            公司名称 <span class="pill pill-col">form_data</span><br>
+            主域名 <span class="pill pill-col">form_data</span><br>
+            新增域别名列表 <span class="pill pill-json">alias_domains</span><br>
+            RSS是否已报备 <span class="pill pill-col">rss_confirmed</span><br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span><br>
+            申请原因 <span class="pill pill-col">form_data</span>
+          </td>
+          <td>营业执照 <span class="pill pill-file">license</span><br>申请表 <span class="pill pill-file">application</span></td>
+        </tr>
+        <tr>
+          <td><strong>解绑多域名/域别名</strong><br><span class="mono" style="color:var(--text3);">unbindDomain</span></td>
+          <td>
+            公司名称 <span class="pill pill-col">form_data</span><br>
+            主域名 <span class="pill pill-col">form_data</span><br>
+            需解绑域名列表 <span class="pill pill-json">form_data</span><br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span><br>
+            申请原因 <span class="pill pill-col">form_data</span>
+          </td>
+          <td>营业执照 <span class="pill pill-file">license</span><br>申请表（解绑多域名/域别名二选一）<span class="pill pill-file">application</span></td>
+        </tr>
+        <tr>
+          <td><strong>更改组织名称</strong><br><span class="mono" style="color:var(--text3);">changeOrgName</span></td>
+          <td>
+            公司名称 <span class="pill pill-col">form_data</span><br>
+            原组织名称 <span class="pill pill-col">old_name</span><br>
+            新组织名称 <span class="pill pill-col">new_name</span><br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span><br>
+            申请原因 <span class="pill pill-col">form_data</span>
+          </td>
+          <td>营业执照 <span class="pill pill-file">license</span><br>申请表 <span class="pill pill-file">application</span></td>
+        </tr>
+        <tr>
+          <td><strong>删除组织配置信息</strong><br><span class="mono" style="color:var(--text3);">deleteOrgConfig</span></td>
+          <td>
+            公司名称 <span class="pill pill-col">form_data</span><br>
+            到期时间 <span class="pill pill-col">expiry_date</span><br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span><br>
+            申请原因 <span class="pill pill-col">form_data</span>
+          </td>
+          <td>营业执照 <span class="pill pill-file">license</span><br>申请表 <span class="pill pill-file">application</span></td>
+        </tr>
+        <tr>
+          <td><strong>延期</strong><br><span class="mono" style="color:var(--text3);">extendPeriod</span></td>
+          <td>
+            公司名称 <span class="pill pill-col">form_data</span><br>
+            到期日期 <span class="pill pill-col">expiry_date</span><br>
+            延期日期 <span class="pill pill-col">extend_date</span>（距到期 ≤3天）<br>
+            延期原因 <span class="pill pill-col">extend_reason</span><br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span>
+          </td>
+          <td class="st-none">无附件</td>
+        </tr>
+        <tr>
+          <td><strong>解绑二次验证</strong><br><span class="mono" style="color:var(--text3);">unbind2FA</span></td>
+          <td>
+            公司名称 <span class="pill pill-col">form_data</span><br>
+            需解绑邮箱账号 <span class="pill pill-col">form_data</span><br>
+            解绑设备类型 <span class="pill pill-json">unbind_devices</span>（手机/APP/微信/备用邮箱多选）<br>
+            解绑原因 <span class="pill pill-col">unbind_reason</span>（下拉）<br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span>
+          </td>
+          <td>营业执照 <span class="pill pill-file">license</span><br>免责声明 <span class="pill pill-file">disclaimer</span></td>
+        </tr>
+        <tr>
+          <td><strong>扩容量</strong><br><span class="mono" style="color:var(--text3);">expandCapacity</span></td>
+          <td>
+            公司名称 <span class="pill pill-col">form_data</span><br>
+            需扩容邮箱 <span class="pill pill-col">form_data</span><br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span><br>
+            申请原因 <span class="pill pill-col">form_data</span>
+          </td>
+          <td>营业执照 <span class="pill pill-file">license</span></td>
+        </tr>
+        <tr>
+          <td><strong>扩容封数</strong><br><span class="mono" style="color:var(--text3);">expandQuota</span></td>
+          <td>
+            公司名称 <span class="pill pill-col">form_data</span><br>
+            需扩容邮箱 <span class="pill pill-col">form_data</span><br>
+            联系人姓名 <span class="pill pill-col">applicant_name</span><br>
+            联系人邮箱 <span class="pill pill-col">applicant_email</span><br>
+            申请原因 <span class="pill pill-col">form_data</span>
+          </td>
+          <td>营业执照 <span class="pill pill-file">license</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note note-blue">
+      <strong>公共信息（所有服务类型）：</strong>客户域名（独立字段，白名单校验）<span class="pill pill-col">form_data.customerDomain</span> ·
+      联系人姓名 <span class="pill pill-col">applicant_name</span> ·
+      联系人邮箱 <span class="pill pill-col">applicant_email</span> ·
+      留存联系方式（联系人/电话/邮箱）<span class="pill pill-col">verify_data</span>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- 3. 数据存储结构 -->
+  <div class="sec">
+    <div class="sec-num">03 / STORAGE</div>
+    <div class="sec-title">数据存储结构</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <span class="tag tag-purple">applications 表</span>
+        <h3>申请主表（40+ 字段）</h3>
+        <p>
+          基础：id / submit_id / service_type / service_name / company_name / status / verify_status<br>
+          联系人：applicant_name / applicant_email<br>
+          业务字段：customer_type / receive_email / rss_confirmed / old_name / new_name / expiry_date / extend_date / extend_reason / unbind_reason<br>
+          JSON 数组：sub_domains / alias_domains / unbind_devices<br>
+          冗余备份：form_data (JSON) / verify_data (JSON)<br>
+          附件路径：business_license_path / identity_card_path / application_form_path / disclaimer_path
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag tag-purple">辅助表</span>
+        <h3>email_logs / customers / system_settings</h3>
+        <p>
+          <strong>email_logs：</strong>每次邮件发送记录（收件人类型/邮箱/主题/状态/Message-ID/错误信息）<br>
+          <strong>customers：</strong>许可域名名单（域名/公司名/联系人/状态/启用停用），后台 /admin/customers 管理，支持 CSV 批量导入<br>
+          <strong>system_settings：</strong>系统配置（白名单域名列表），后台 /admin/whitelist 管理
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- 4. 尚未实现 -->
+  <div class="sec">
+    <div class="sec-num">04 / TODO</div>
+    <div class="sec-title">尚未实现的功能</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:180px;">功能</th>
+          <th>现状</th>
+          <th style="width:220px;">未实现原因</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>根据客户域名匹配服务商邮箱</strong></td>
+          <td>
+            服务商邮箱当前<strong>硬编码</strong>为 <span class="mono">400cz@icoremail.cn</span><br>
+            售后邮箱当前<strong>硬编码</strong>为 <span class="mono">support@coremail.cn</span><br>
+            所有申请都发送到同一服务商邮箱，无法按客户区分
+          </td>
+          <td>
+            <span class="tag tag-amber">原因</span><br>
+            <strong>尚未收集到客户域名与服务商邮箱的对应清单</strong><br>
+            <span style="color:var(--text2);">待业务侧提供域名 → 服务商邮箱映射表后，可实现自动匹配发送</span>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>其他待开发项</strong></td>
+          <td>
+            - CSV 批量导入客户名单<br>
+            - 模板按签约主体双套（广东盈世/论客）<br>
+            - 延期/删除组织配置的到期时间自动判断
+          </td>
+          <td>
+            <span class="tag tag-gray">说明</span><br>
+            <span style="color:var(--text2);">需求已明确，待后续排期</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note note-amber">
+      <strong>预期方案：</strong>新建 domain_providers 映射表（domain → provider_email + priority），提交申请时根据客户域名自动解析服务商邮箱，未匹配时走兜底邮箱并在邮件主题标注 [未匹配服务商]。
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:24px 0;color:var(--text3);font-size:12px;">
+    客户服务申请系统 · 功能现状总览 V1.0 · 2026.07.31
+  </div>
+</div>
+
+</body>
+</html>
