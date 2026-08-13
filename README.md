@@ -148,31 +148,52 @@ npx tsx relay-server/index.ts  # relay
 
 ## CORS 白名单同步
 
-系统有两处 CORS 白名单（浏览器跨域请求的门卫，只放行名单中的网页）：
+### 功能说明
 
-| 位置 | 管什么 | 配置项 |
-|------|--------|--------|
-| 内网后端 | 管理后台页面调用后端 API | `ALLOWED_ORIGINS` |
-| 公网 relay | 公网前端页面调用 relay 提交 | `RELAY_ALLOWED_ORIGINS` |
+CORS（Cross-Origin Resource Sharing，跨域资源共享）是浏览器实施的安全策略：**网页只能调用与自身"同源"（协议+域名+端口一致）的接口**，跨源调用时，目标服务器必须通过 `Access-Control-Allow-Origin` 响应头显式授权。
 
-**⚠️ 更换访问地址（域名/IP）时必须同步更新白名单**，否则页面报错"被 CORS 拦截"：
+本系统采用前后端分离 + 双服务器部署（公网前端 / 内网后端），所有跨源调用都依赖 CORS 白名单放行：
+
+| 位置 | 服务端 | 受保护的跨源调用 | 配置项 |
+|------|--------|------------------|--------|
+| 内网后端 | Express | 管理后台页面（:3002）→ 后端 API（`/api/*`）| `ALLOWED_ORIGINS` |
+| 公网 relay | Express | 公网表单页（:3001 / 正式域名）→ relay（`/api/submit` 等）| `RELAY_ALLOWED_ORIGINS` |
+
+**拦截行为**：请求携带的 `Origin` 头不在白名单时，后端返回 `403`，浏览器拒绝读取响应——表现即"页面能打开但数据加载失败"。
+
+### 为什么需要"同步"
+
+白名单是**按访问地址（Origin）精确匹配**的静态配置。系统访问入口会随环境变化：
+
+| 环境 | 前端 Origin | 需写入的位置 |
+|------|-------------|-------------|
+| 本地开发 | `http://localhost:3001` | 后端 `ALLOWED_ORIGINS` |
+| 局域网管理后台 | `http://<内网IP>:3002` | 后端 `ALLOWED_ORIGINS` |
+| 公网正式部署 | `https://apply.company.com` | 后端 + relay 的 `ALLOWED_ORIGINS` / `RELAY_ALLOWED_ORIGINS` |
+| 隧道临时测试（ngrok）| `https://*.ngrok-free.dev` | 后端 + relay 白名单（域名每次重启会变，需重配）|
+
+**任何一次访问入口变化，都必须同步更新对应白名单**，否则该入口立即失效。这是部署切换（本地 → 内网 → 公网）中最常见的坑之一。
+
+### 配置方式
 
 ```bash
-# 示例：本地 → 公网域名
-# 内网后端 .env
-ALLOWED_ORIGINS=https://apply.company.com,http://内网IP
+# 内网后端 .env（逗号分隔多个 Origin）
+ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3002,http://192.168.1.100:3002,https://apply.company.com
 
 # 公网 relay .env
-RELAY_ALLOWED_ORIGINS=https://apply.company.com
+RELAY_ALLOWED_ORIGINS=http://localhost:3001,https://apply.company.com
 ```
 
-**常见场景**：
-- 本地开发：`http://localhost:3001`（前端）、`http://localhost:3002`（管理后台）
-- 局域网访问：加入 `http://192.168.x.x:3002`（本机 IP）
-- 公网部署：加入 `https://apply.company.com`（正式域名）
-- ngrok 隧道测试：加入 `https://xxx.ngrok-free.dev`（域名每次重启可能变化）
+> 同源调用（如内网管理后台直接访问后端自身）不受 CORS 限制；未携带 `Origin` 的请求（如 curl、服务端调用）默认放行，不参与白名单校验。
 
-> 判断方法：页面能打开但数据加载失败，浏览器控制台报 `Not allowed by CORS` → 就是白名单没加当前访问地址。
+### 故障排查
+
+浏览器控制台出现以下任一信息 → 白名单未包含当前访问地址：
+
+- `Access to fetch at ... from origin 'http://xxx' has been blocked by CORS policy`
+- 响应为 `403` 且 body 含 `Not allowed by CORS`
+
+**处理**：将报错中的 Origin 值加入对应 `.env` 白名单 → 重启服务生效。
 
 ## 部署
 
